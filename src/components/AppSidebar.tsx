@@ -57,6 +57,23 @@ export function AppSidebar() {
     >
       <SidebarTrigger className="m-2 self-end" />
 
+      {/* Logo Section */}
+      <div className="p-4 border-b border-sidebar-border">
+        {isCollapsed ? (
+          <img 
+            src="https://dummyimage.com/50x50/ddd/006DD9&text=L" 
+            alt="Logo"
+            className="w-8 h-8 mx-auto"
+          />
+        ) : (
+          <img 
+            src="https://dummyimage.com/200x50/ddd/006DD9&text=Logo" 
+            alt="Logo"
+            className="h-8 w-auto"
+          />
+        )}
+      </div>
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>

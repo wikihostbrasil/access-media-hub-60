@@ -13,7 +13,7 @@ class JWTHandler {
     public function __construct() {
         $this->secret_key = $_ENV['JWT_SECRET'] ?? 'arquivo_manager_jwt_secret_key_default';
         $this->issued_at = time();
-        $this->expiration_time = $this->issued_at + (24 * 60 * 60); // 24 hours
+        $this->expiration_time = $this->issued_at + (7 * 24 * 60 * 60); // 7 days - can be adjusted in /api/config/jwt.php line 16
     }
 
     public function createToken($user_id, $email, $role) {
