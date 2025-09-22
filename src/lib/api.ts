@@ -1,5 +1,9 @@
 // API client for PHP backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost/arquivo-manager/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
+  window.location.hostname === 'localhost' 
+    ? 'http://localhost/arquivo-manager/api'
+    : `${window.location.protocol}//${window.location.host}/api`
+);
 
 interface ApiResponse<T> {
   data?: T;
