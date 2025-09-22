@@ -15,26 +15,37 @@ export function useApiAuth() {
   useEffect(() => {
     // Check if user is logged in by checking token
     const token = localStorage.getItem('access_token');
-    if (token) {
-      // Validate token by making a request
+    const userData = localStorage.getItem('user_data');
+    
+    if (token && userData) {
+      // We have both token and user data
+      console.log('Auth: Found token and user data, setting user');
+      setUser(JSON.parse(userData));
+      setLoading(false);
+    } else if (token && !userData) {
+      // We have token but no user data - validate token
+      console.log('Auth: Found token but no user data, validating...');
       apiClient.getFiles()
         .then(() => {
-          // Token is valid, but we need user info
-          // For now, we'll decode the token or make a profile request
-          const userData = localStorage.getItem('user_data');
-          if (userData) {
-            setUser(JSON.parse(userData));
-          }
+          console.log('Auth: Token is valid but no user data found');
+          // Token is valid but we don't have user data
+          // This shouldn't happen in normal flow, but let's handle it
+          // For now, we'll clear the token and let user login again
+          apiClient.setToken(null);
+          localStorage.removeItem('access_token');
+          setLoading(false);
         })
         .catch(() => {
+          console.log('Auth: Token is invalid, clearing...');
           // Token is invalid
           apiClient.setToken(null);
+          localStorage.removeItem('access_token');
           localStorage.removeItem('user_data');
-        })
-        .finally(() => {
           setLoading(false);
         });
     } else {
+      // No token
+      console.log('Auth: No token found');
       setLoading(false);
     }
   }, []);
