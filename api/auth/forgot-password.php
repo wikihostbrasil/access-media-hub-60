@@ -5,6 +5,19 @@ include_once '../config/database.php';
 $database = new Database();
 $db = $database->getConnection();
 
+// Add columns if they don't exist
+try {
+    $db->exec("ALTER TABLE users ADD COLUMN reset_token VARCHAR(255) NULL");
+} catch (Exception $e) {
+    // Column already exists
+}
+
+try {
+    $db->exec("ALTER TABLE users ADD COLUMN reset_token_expires TIMESTAMP NULL");
+} catch (Exception $e) {
+    // Column already exists
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
     
@@ -49,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(array("error" => "Erro interno do servidor"));
+        echo json_encode(array("error" => "Erro interno do servidor: " . $e->getMessage()));
     }
 } else {
     http_response_code(405);
