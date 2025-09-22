@@ -2,10 +2,13 @@
 include_once '../config/cors.php';
 include_once '../config/database.php';
 include_once '../config/jwt.php';
+include_once '../config/security.php';
+include_once '../config/auth-security.php';
 
 $database = new Database();
 $db = $database->getConnection();
 $jwt = new JWTHandler();
+$auth_security = new AuthSecurity($db);
 
 // Validate token
 $token = $jwt->getBearerToken();
@@ -35,20 +38,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     }
 
     try {
-        // Check if user has permission to delete
-        if ($user_role !== 'admin') {
-            $check_query = "SELECT created_by FROM categories WHERE id = :category_id";
-            $check_stmt = $db->prepare($check_query);
-            $check_stmt->bindParam(":category_id", $category_id);
-            $check_stmt->execute();
-            
-            $category = $check_stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$category || $category['created_by'] !== $user_id) {
-                http_response_code(403);
-                echo json_encode(array("error" => "Sem permissão para deletar esta categoria"));
-                exit();
-            }
+        // Check rate limiting for delete operations
+        $auth_security->checkCriticalRateLimit($user_id, 'category_delete', 5, 300);
+        
+        // Get category info and check permissions
+        $check_query = "SELECT created_by FROM categories WHERE id = :category_id";
+        $check_stmt = $db->prepare($check_query);
+        $check_stmt->bindParam(":category_id", $category_id);
+        $check_stmt->execute();
+        
+        $category = $check_stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$category) {
+            http_response_code(404);
+            echo json_encode(array("error" => "Categoria não encontrada"));
+            exit();
         }
+        
+        // Check if user can modify this resource (admin or owner)
+        $auth_security->canModifyResource($user_id, $category['created_by'], 'delete_category');
 
         // Delete category
         $query = "DELETE FROM categories WHERE id = :category_id";

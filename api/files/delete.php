@@ -2,10 +2,13 @@
 include_once '../config/cors.php';
 include_once '../config/database.php';
 include_once '../config/jwt.php';
+include_once '../config/security.php';
+include_once '../config/auth-security.php';
 
 $database = new Database();
 $db = $database->getConnection();
 $jwt = new JWTHandler();
+$auth_security = new AuthSecurity($db);
 
 // Validate token
 $token = $jwt->getBearerToken();
@@ -35,20 +38,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     }
 
     try {
-        // Check if user has permission to delete
-        if ($user_role !== 'admin') {
-            $check_query = "SELECT created_by FROM files WHERE id = :file_id AND deleted_at IS NULL";
-            $check_stmt = $db->prepare($check_query);
-            $check_stmt->bindParam(":file_id", $file_id);
-            $check_stmt->execute();
-            
-            $file = $check_stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$file || $file['created_by'] !== $user_id) {
-                http_response_code(403);
-                echo json_encode(array("error" => "Sem permissão para deletar este arquivo"));
-                exit();
-            }
+        // Check rate limiting for delete operations
+        $auth_security->checkCriticalRateLimit($user_id, 'file_delete', 5, 300);
+        
+        // Get file info and check permissions
+        $check_query = "SELECT uploaded_by FROM files WHERE id = :file_id AND deleted_at IS NULL";
+        $check_stmt = $db->prepare($check_query);
+        $check_stmt->bindParam(":file_id", $file_id);
+        $check_stmt->execute();
+        
+        $file = $check_stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$file) {
+            http_response_code(404);
+            echo json_encode(array("error" => "Arquivo não encontrado"));
+            exit();
         }
+        
+        // Check if user can modify this resource (admin or owner)
+        $auth_security->canModifyResource($user_id, $file['uploaded_by'], 'delete_file');
 
         // Soft delete
         $query = "UPDATE files SET deleted_at = NOW() WHERE id = :file_id";

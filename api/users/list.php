@@ -2,10 +2,13 @@
 include_once '../config/cors.php';
 include_once '../config/database.php';
 include_once '../config/jwt.php';
+include_once '../config/security.php';
+include_once '../config/auth-security.php';
 
 $database = new Database();
 $db = $database->getConnection();
 $jwt = new JWTHandler();
+$auth_security = new AuthSecurity($db);
 
 // Validate token
 $token = $jwt->getBearerToken();
@@ -24,12 +27,11 @@ if (!$user_data) {
 
 $user_role = $user_data['role'];
 
-// Check permissions
-if ($user_role === 'user') {
-    http_response_code(403);
-    echo json_encode(array("error" => "Acesso negado"));
-    exit();
-}
+// Check admin permissions with database revalidation
+$auth_security->requireAdmin($user_data['id'], 'list_users');
+
+// Check rate limiting for admin operations
+$auth_security->checkCriticalRateLimit($user_data['id'], 'list_users', 10, 60);
 
 try {
     $query = "SELECT p.*, u.email FROM profiles p 
