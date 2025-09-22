@@ -36,6 +36,33 @@ function decodeJwt(token: string): Partial<User> | null {
   }
 }
 
+async function validateUserRole() {
+  const token = localStorage.getItem('access_token');
+  if (!token || !authUser) return;
+  
+  try {
+    const serverUser = await apiClient.validateUserRole();
+    
+    // If role changed on server, update local state
+    if (authUser.role !== serverUser.role) {
+      console.warn('Role mismatch detected. Updating local state.');
+      const validRole = (serverUser.role === 'admin' || serverUser.role === 'operator' || serverUser.role === 'user') 
+        ? serverUser.role : 'user';
+      authUser = { ...authUser, ...serverUser, role: validRole };
+      localStorage.setItem('user_data', JSON.stringify(authUser));
+      notify();
+    }
+  } catch (error) {
+    console.error('Role validation failed:', error);
+    // On validation failure, force logout for security
+    authUser = null;
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_data');
+    authLoading = false;
+    notify();
+  }
+}
+
 function initAuthOnce() {
   if (initialized) return;
   initialized = true;
@@ -46,6 +73,8 @@ function initAuthOnce() {
   if (token && userData) {
     try {
       authUser = JSON.parse(userData);
+      // Validate role on initialization
+      validateUserRole();
     } catch {
       authUser = null;
     }
@@ -60,6 +89,8 @@ function initAuthOnce() {
     if (partial) {
       authUser = partial as User;
       localStorage.setItem('user_data', JSON.stringify(authUser));
+      // Validate role on initialization
+      validateUserRole();
     }
     authLoading = false;
     notify();
@@ -71,6 +102,13 @@ function initAuthOnce() {
   authLoading = false;
   notify();
 }
+
+// Periodic role validation every 5 minutes
+setInterval(() => {
+  if (authUser) {
+    validateUserRole();
+  }
+}, 5 * 60 * 1000);
 
 export function useApiAuth() {
   const [user, setUser] = useState<User | null>(authUser);

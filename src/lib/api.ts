@@ -185,6 +185,11 @@ class ApiClient {
       body: JSON.stringify({ email }),
     });
   }
+
+  // Validate current user role from server
+  async validateUserRole() {
+    return this.request<{ role: string; id: string; email: string; full_name: string }>('/auth/validate-role.php');
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
