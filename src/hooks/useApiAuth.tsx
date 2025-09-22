@@ -44,8 +44,7 @@ export function useApiAuth() {
       const response = await apiClient.signIn(email, password);
       setUser(response.user);
       localStorage.setItem('user_data', JSON.stringify(response.user));
-      // Force reload do componente App para atualizar o estado de autenticação
-      window.location.reload();
+      // Não fazer reload - deixar o React gerenciar o estado
       return { error: null };
     } catch (error) {
       return { error: error as Error };

@@ -167,52 +167,59 @@ export const UploadFileDialog = ({ open, onOpenChange }: UploadFileDialogProps) 
             </div>
           </div>
 
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Título *</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Digite o título do arquivo"
-              required
-            />
-          </div>
+          {/* Form Fields in responsive grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              {/* Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title">Título *</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Digite o título do arquivo"
+                  required
+                />
+              </div>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva o conteúdo do arquivo (opcional)"
-              rows={3}
-            />
-          </div>
-
-          {/* Permissions */}
-          <div className="space-y-4">
-            <div>
-              <Label>Permissões de Acesso</Label>
-              <p className="text-sm text-muted-foreground">
-                Selecione usuários, grupos ou categorias que podem acessar este arquivo
-              </p>
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Descrição</Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Descreva o conteúdo do arquivo (opcional)"
+                  rows={3}
+                />
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <UserSearchSelect
-                selectedUsers={selectedUsers}
-                onSelectionChange={setSelectedUsers}
-              />
-              <GroupSearchSelect
-                selectedGroups={selectedGroups}
-                onSelectionChange={setSelectedGroups}
-              />
-              <CategorySearchSelect
-                selectedCategories={selectedCategories}
-                onSelectionChange={setSelectedCategories}
-              />
+            <div className="space-y-6">
+              {/* Permissions */}
+              <div className="space-y-4">
+                <div>
+                  <Label>Permissões de Acesso</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Selecione usuários, grupos ou categorias que podem acessar este arquivo
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <UserSearchSelect
+                    selectedUsers={selectedUsers}
+                    onSelectionChange={setSelectedUsers}
+                  />
+                  <GroupSearchSelect
+                    selectedGroups={selectedGroups}
+                    onSelectionChange={setSelectedGroups}
+                  />
+                  <CategorySearchSelect
+                    selectedCategories={selectedCategories}
+                    onSelectionChange={setSelectedCategories}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
