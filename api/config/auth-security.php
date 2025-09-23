@@ -6,7 +6,7 @@ class AuthSecurity {
     
     public function __construct($db) {
         $this->db = $db;
-        $this->security_logger = new SecurityLogger();
+        $this->security_logger = new SecurityLogger($db);
     }
     
     /**
