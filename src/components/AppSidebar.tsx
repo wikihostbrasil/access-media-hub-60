@@ -42,6 +42,7 @@ export function AppSidebar() {
     { title: "Categorias", url: "/categories", icon: FolderOpen, roles: ['admin', 'operator'] },
     { title: "Downloads", url: "/downloads", icon: Download, roles: ['admin'] },
     { title: "Relatórios", url: "/reports", icon: BarChart3, roles: ['admin'] },
+    { title: "Logs de Acesso", url: "/access-logs", icon: BarChart3, roles: ['admin'] },
     { title: "Configurações", url: "/settings", icon: Settings, roles: ['admin', 'operator'] },
     { title: "Meu Perfil", url: "/profile", icon: Users, roles: ['admin', 'operator', 'user'] },
   ];
@@ -58,18 +59,18 @@ export function AppSidebar() {
       <SidebarTrigger className="m-2 self-end" />
 
       {/* Logo Section */}
-      <div className="p-4 border-b border-sidebar-border">
+      <div className="p-4 border-b border-sidebar-border flex justify-center items-center">
         {isCollapsed ? (
           <img 
             src="https://dummyimage.com/50x50/ddd/006DD9&text=L" 
             alt="Logo"
-            className="w-8 h-8 mx-auto"
+            className="w-8 h-8"
           />
         ) : (
           <img 
             src="https://dummyimage.com/200x50/ddd/006DD9&text=Logo" 
             alt="Logo"
-            className="h-8 w-auto"
+            className="h-8 w-auto max-w-full"
           />
         )}
       </div>

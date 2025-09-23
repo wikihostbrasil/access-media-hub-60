@@ -194,6 +194,18 @@ class ApiClient {
   async validateUserRole() {
     return this.request<{ role: string; id: string; email: string; full_name: string }>('/auth/validate-role.php');
   }
+
+  // Profile management
+  async updateProfile(data: { full_name: string; whatsapp?: string; receive_notifications: boolean }) {
+    return this.request<{ message: string }>("/users/update.php", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getProfile() {
+    return this.request<any>("/users/profile.php");
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

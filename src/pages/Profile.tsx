@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { User, Mail, Phone, Bell, Save } from "lucide-react";
 import { useApiAuth } from "@/hooks/useApiAuth";
 import { useToast } from "@/hooks/use-toast";
+import { apiClient } from "@/lib/api";
 
 interface UserProfile {
   id: string;
@@ -46,7 +47,7 @@ export default function Profile() {
     setSaving(true);
     
     try {
-      // Note: Profile update would need PHP implementation
+      await apiClient.updateProfile(formData);
       toast({
         title: "Perfil atualizado",
         description: "Suas informações foram salvas com sucesso!",

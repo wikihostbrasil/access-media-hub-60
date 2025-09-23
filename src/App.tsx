@@ -23,6 +23,7 @@ import Downloads from "@/pages/Downloads";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import Profile from "@/pages/Profile";
+import AccessLogs from "@/pages/AccessLogs";
 import SignupSuccess from "@/pages/SignupSuccess";
 
 
@@ -92,6 +93,7 @@ function AuthenticatedApp() {
               {profile?.role !== 'user' && <Route path="/categories" element={<Categories />} />}
               {profile?.role === 'admin' && <Route path="/downloads" element={<Downloads />} />}
               {profile?.role === 'admin' && <Route path="/reports" element={<Reports />} />}
+              {profile?.role === 'admin' && <Route path="/access-logs" element={<AccessLogs />} />}
               {profile?.role !== 'user' && <Route path="/settings" element={<Settings />} />}
               <Route path="/profile" element={<Profile />} />
               <Route path="/auth" element={<Navigate to="/" replace />} />

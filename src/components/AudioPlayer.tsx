@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Play, Pause, Volume2, Download } from "lucide-react";
 import { apiClient } from "@/lib/api";
+import { useGlobalAudioPlayer } from "@/hooks/useGlobalAudioPlayer";
 
 interface AudioPlayerProps {
   fileUrl: string;
@@ -18,6 +19,7 @@ export const AudioPlayer = ({ fileUrl, fileName, fileId }: AudioPlayerProps) => 
   const [isLoading, setIsLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { currentlyPlaying, stopOthers, setCurrentlyPlaying } = useGlobalAudioPlayer();
 
   // Use file URL directly (assuming it's accessible)
   useEffect(() => {
@@ -38,14 +40,20 @@ export const AudioPlayer = ({ fileUrl, fileName, fileId }: AudioPlayerProps) => 
 
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
+      setCurrentlyPlaying(null);
     } else {
+      // Stop any other audio players
+      stopOthers(fileId);
+      
       audioRef.current.play();
+      setIsPlaying(true);
+      
       // Track as play when first played
       if (currentTime === 0) {
         trackPlay();
       }
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleTimeUpdate = () => {
@@ -121,9 +129,13 @@ export const AudioPlayer = ({ fileUrl, fileName, fileId }: AudioPlayerProps) => 
       <audio
         ref={audioRef}
         src={audioUrl}
+        data-file-id={fileId}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={() => {
+          setIsPlaying(false);
+          setCurrentlyPlaying(null);
+        }}
         preload="metadata"
       />
       
