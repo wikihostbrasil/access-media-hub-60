@@ -23,3 +23,28 @@ export const useUsers = () => {
     },
   });
 };
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ userId, userData }: { userId: string; userData: any }) => {
+      return apiClient.updateUser(userId, userData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "Sucesso",
+        description: "Usuário atualizado com sucesso!",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: `Erro ao atualizar usuário: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+};

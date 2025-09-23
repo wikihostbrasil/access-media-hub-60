@@ -112,6 +112,16 @@ class ApiClient {
     return this.request<any[]>('/users/list.php');
   }
 
+  async updateUser(userId: string, userData: any) {
+    return this.request('/users/update-user.php', {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: userId,
+        ...userData
+      }),
+    });
+  }
+
   // Groups methods
   async getGroups() {
     return this.request<any[]>('/groups/list.php');
@@ -167,6 +177,31 @@ class ApiClient {
   async deleteGroup(id: string) {
     return this.request(`/groups/delete.php?id=${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  async updateGroup(groupId: string, groupData: any) {
+    return this.request('/groups/update.php', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: groupId,
+        ...groupData
+      }),
+    });
+  }
+
+  async getGroupMembers(groupId: string) {
+    return this.request<any[]>(`/groups/manage-members.php?group_id=${groupId}`);
+  }
+
+  async updateGroupMembers(groupId: string, userIds: string[], action: string = 'set') {
+    return this.request('/groups/manage-members.php', {
+      method: 'POST',
+      body: JSON.stringify({
+        group_id: groupId,
+        user_ids: userIds,
+        action
+      }),
     });
   }
 
