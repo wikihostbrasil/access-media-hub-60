@@ -36,6 +36,7 @@ $auth_security->checkCriticalRateLimit($user_data['id'], 'list_users', 10, 60);
 try {
     $query = "SELECT p.*, u.email FROM profiles p 
               JOIN users u ON p.user_id = u.id 
+              WHERE p.active = true
               ORDER BY p.created_at DESC";
     $stmt = $db->prepare($query);
     $stmt->execute();
@@ -46,6 +47,6 @@ try {
     echo json_encode($users);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(array("error" => "Erro ao buscar usuários"));
+    echo json_encode(array("error" => "Erro ao buscar usuários: " . $e->getMessage()));
 }
 ?>

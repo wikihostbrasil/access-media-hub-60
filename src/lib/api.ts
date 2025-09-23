@@ -112,6 +112,13 @@ class ApiClient {
     return this.request<any[]>('/users/list.php');
   }
 
+  async updateProfile(profileData: any) {
+    return this.request('/users/update.php', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
+
   async updateUser(userId: string, userData: any) {
     return this.request('/users/update-user.php', {
       method: 'POST',
@@ -228,14 +235,6 @@ class ApiClient {
   // Validate current user role from server
   async validateUserRole() {
     return this.request<{ role: string; id: string; email: string; full_name: string }>('/auth/validate-role.php');
-  }
-
-  // Profile management
-  async updateProfile(data: { full_name: string; whatsapp?: string; receive_notifications: boolean }) {
-    return this.request<{ message: string }>("/users/update.php", {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
   }
 
   async getProfile() {

@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                   FROM user_groups ug 
                   JOIN profiles p ON ug.user_id = p.user_id 
                   JOIN users u ON p.user_id = u.id 
-                  WHERE ug.group_id = :group_id 
+                  WHERE ug.group_id = :group_id AND p.active = true
                   ORDER BY p.full_name";
         $stmt = $db->prepare($query);
         $stmt->bindParam(":group_id", $group_id);

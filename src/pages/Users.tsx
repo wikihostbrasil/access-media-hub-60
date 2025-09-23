@@ -170,7 +170,7 @@ const Users = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
-                      Email protegido
+                      {user.email ? user.email.substring(0, 3) + '***' + user.email.substring(user.email.indexOf('@')) : 'Não informado'}
                     </TableCell>
                     <TableCell className="text-sm">
                       {user.whatsapp || "Não informado"}

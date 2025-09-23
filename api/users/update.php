@@ -54,16 +54,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $stmt->execute();
 
         if ($stmt->rowCount() === 0) {
-            http_response_code(404);
-            echo json_encode(array("error" => "Perfil não encontrado"));
-            exit();
+            // Try to insert profile if it doesn't exist
+            $insert_query = "INSERT INTO profiles (user_id, full_name, whatsapp, receive_notifications, created_at, updated_at) 
+                           VALUES (:user_id, :full_name, :whatsapp, :receive_notifications, NOW(), NOW())";
+            $insert_stmt = $db->prepare($insert_query);
+            $insert_stmt->bindParam(":user_id", $user_id);
+            $insert_stmt->bindParam(":full_name", $full_name);
+            $insert_stmt->bindParam(":whatsapp", $whatsapp);
+            $insert_stmt->bindParam(":receive_notifications", $receive_notifications, PDO::PARAM_BOOL);
+            $insert_stmt->execute();
+            
+            if ($insert_stmt->rowCount() === 0) {
+                http_response_code(404);
+                echo json_encode(array("error" => "Erro ao criar/atualizar perfil"));
+                exit();
+            }
         }
 
         http_response_code(200);
         echo json_encode(array("message" => "Perfil atualizado com sucesso"));
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(array("error" => "Erro ao atualizar perfil"));
+        echo json_encode(array("error" => "Erro ao atualizar perfil: " . $e->getMessage()));
     }
 } else {
     http_response_code(405);
